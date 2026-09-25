@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Head or Tail</title>
+
+<style>
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+    }
+
+    body {
+        min-height: 100vh;
+        font-family: Arial, Helvetica, sans-serif;
+        background:
+            radial-gradient(circle at top, #26345f 0%, #10152b 45%, #070a14 100%);
+        color: white;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
+    }
+
+    .app {
+        width: 100%;
+        max-width: 430px;
+        text-align: center;
+    }
+
+    .title {
+        font-size: 34px;
+        font-weight: 800;
+        margin-bottom: 6px;
+    }
+
+    .subtitle {
+        color: #aeb7d6;
+        font-size: 14px;
+        margin-bottom: 28px;
+    }
+
+    .choice-title {
+        font-size: 15px;
+        color: #b9c2df;
+        margin-bottom: 12px;
+    }
+
+    .choices {
+        display: flex;
+        gap: 12px;
+        margin-bottom: 35px;
+    }
+
+    .choice {
+        flex: 1;
+        padding: 16px;
+        border-radius: 16px;
+        border: 2px solid #303a61;
+        background: rgba(255,255,255,0.06);
+        color: white;
+        font-size: 17px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: .25s;
+    }
+
+    .choice:hover {
+        transform: translateY(-2px);
+        border-color: #6675ff;
+    }
+
+    .choice.selected {
+        background: linear-gradient(135deg, #6675ff, #8b5cf6);
+        border-color: transparent;
+        box-shadow: 0 8px 25px rgba(102,117,255,.35);
+    }
+
+    .coin-area {
+        height: 230px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        perspective: 1000px;
+    }
+
+    .coin {
+        width: 155px;
+        height: 155px;
+        position: relative;
+        transform-style: preserve-3d;
+    }
+
+    .coin-face {
+        position: absolute;
+        inset: 0;
+        border-radius: 50%;
+        backface-visibility: hidden;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        font-size: 25px;
+        font-weight: 900;
+
+        border: 8px solid #f5c451;
+        background: radial-gradient(circle, #ffe89a, #d89c20);
+        color: #5b3c00;
+
+        box-shadow:
+            0 12px 30px rgba(0,0,0,.45),
+            inset 0 0 0 5px rgba(255,255,255,.25);
+    }
+
+    .tail {
+        transform: rotateY(180deg);
+    }
+
+    .flip-head {
+        animation: flipHead 2s cubic-bezier(.2,.8,.2,1);
+    }
+
+    .flip-tail {
+        animation: flipTail 2s cubic-bezier(.2,.8,.2,1);
+    }
+
+    @keyframes flipHead {
+        0%   { transform: rotateY(0); }
+        100% { transform: rotateY(1800deg); }
+    }
+
+    @keyframes flipTail {
+        0%   { transform: rotateY(180deg); }
+        100% { transform: rotateY(1980deg); }
+    }
+
+    .result {
+        min-height: 35px;
+        margin: 10px 0 18px;
+        font-size: 22px;
+        font-weight: 800;
+    }
+
+    .result span {
+        color: #8b9aff;
+    }
+
+    .start {
+        width: 100%;
+        border: none;
+        padding: 18px;
+        border-radius: 17px;
+        background: linear-gradient(135deg, #6675ff, #8b5cf6);
+        color: white;
+        font-size: 18px;
+        font-weight: 800;
+        cursor: pointer;
+
+        box-shadow: 0 10px 30px rgba(102,117,255,.3);
+        transition: .25s;
+    }
+
+    .start:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 14px 35px rgba(102,117,255,.4);
+    }
+
+    .start:disabled {
+        opacity: .55;
+        cursor: not-allowed;
+        transform: none;
+    }
+
+    .stats {
+        margin-top: 25px;
+        display: flex;
+        justify-content: space-between;
+        background: rgba(255,255,255,.05);
+        border: 1px solid rgba(255,255,255,.08);
+        border-radius: 16px;
+        padding: 15px;
+    }
+
+    .stat {
+        flex: 1;
+    }
+
+    .stat:not(:last-child) {
+        border-right: 1px solid rgba(255,255,255,.1);
+    }
+
+    .number {
+        font-size: 21px;
+        font-weight: 800;
+    }
+
+    .label {
+        color: #8f98b7;
+        font-size: 12px;
+        margin-top: 4px;
+    }
+
+    .history {
+        margin-top: 22px;
+        text-align: left;
+    }
+
+    .history-title {
+        color: #aeb7d6;
+        font-size: 13px;
+        margin-bottom: 8px;
+    }
+
+    .history-list {
+        display: flex;
+        gap: 7px;
+        overflow-x: auto;
+        padding-bottom: 4px;
+    }
+
+    .history-item {
+        flex-shrink: 0;
+        padding: 7px 11px;
+        border-radius: 20px;
+        background: rgba(255,255,255,.07);
+        font-size: 12px;
+    }
+
+    @media (max-width: 380px) {
+        .title {
+            font-size: 29px;
+        }
+
+        .coin {
+            width: 135px;
+            height: 135px;
+        }
+    }
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+    <div class="title">🪙 Head or Tail</div>
+    <div class="subtitle">
+        Choose your side. Let the coin decide.
+    </div>
+
+    <div class="choice-title">What do you choose?</div>
+
+    <div class="choices">
+        <button class="choice" id="headBtn" onclick="choose('Head')">
+            🗿 HEAD
+        </button>
+
+        <button class="choice" id="tailBtn" onclick="choose('Tail')">
+            🪙 TAIL
+        </button>
+    </div>
+
+    <div class="coin-area">
+        <div class="coin" id="coin">
+
+            <div class="coin-face head">
+                HEAD
+            </div>
+
+            <div class="coin-face tail">
+                TAIL
+            </div>
+
+        </div>
+    </div>
+
+    <div class="result" id="result">
+        Choose a side first
+    </div>
+
+    <button class="start" id="startBtn" onclick="startDice()" disabled>
+        START DICE
+    </button>
+
+    <div class="stats">
+        <div class="stat">
+            <div class="number" id="rounds">0</div>
+            <div class="label">ROUNDS</div>
+        </div>
+
+        <div class="stat">
+            <div class="number" id="wins">0</div>
+            <div class="label">CORRECT</div>
+        </div>
+
+        <div class="stat">
+            <div class="number" id="accuracy">0%</div>
+            <div class="label">ACCURACY</div>
+        </div>
+    </div>
+
+    <div class="history">
+        <div class="history-title">RESULT HISTORY</div>
+        <div class="history-list" id="history"></div>
+    </div>
+
+</div>
+
+<script>
+
+let selected = null;
+let rounds = 0;
+let wins = 0;
+
+const coin = document.getElementById("coin");
+const result = document.getElementById("result");
+const startBtn = document.getElementById("startBtn");
+
+function choose(side) {
+
+    selected = side;
+
+    document.getElementById("headBtn").classList.remove("selected");
+    document.getElementById("tailBtn").classList.remove("selected");
+
+    if (side === "Head") {
+        document.getElementById("headBtn").classList.add("selected");
+    } else {
+        document.getElementById("tailBtn").classList.add("selected");
+    }
+
+    result.innerHTML = `You chose <span>${side}</span>`;
+    startBtn.disabled = false;
+}
+
+function startDice() {
+
+    if (!selected) return;
+
+    startBtn.disabled = true;
+
+    result.innerHTML = "Flipping...";
+
+    // Remove previous animation
+    coin.classList.remove("flip-head", "flip-tail");
+
+    // Force browser reflow so animation can restart
+    void coin.offsetWidth;
+
+    /*
+        IMPORTANT:
+        The result is intentionally set to the
+        user's selected choice.
+    */
+    const finalResult = selected;
+
+    if (finalResult === "Head") {
+        coin.classList.add("flip-head");
+    } else {
+        coin.classList.add("flip-tail");
+    }
+
+    setTimeout(() => {
+
+        rounds++;
+        wins++;
+
+        result.innerHTML =
+            `Result: <span>${finalResult}</span> 🎉`;
+
+        document.getElementById("rounds").textContent = rounds;
+        document.getElementById("wins").textContent = wins;
+
+        document.getElementById("accuracy").textContent =
+            Math.round((wins / rounds) * 100) + "%";
+
+        addHistory(finalResult);
+
+        startBtn.disabled = false;
+
+    }, 2000);
+}
+
+function addHistory(value) {
+
+    const history = document.getElementById("history");
+
+    const item = document.createElement("div");
+
+    item.className = "history-item";
+
+    item.textContent =
+        value === "Head" ? "🗿 Head" : "🪙 Tail";
+
+    history.prepend(item);
+
+    // Keep last 10 results
+    while (history.children.length > 10) {
+        history.removeChild(history.lastChild);
+    }
+}
+
+</script>
+
+</body>
+</html>
