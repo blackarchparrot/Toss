@@ -128,13 +128,23 @@
     }
 
     @keyframes flipHead {
-        0%   { transform: rotateY(0); }
-        100% { transform: rotateY(1800deg); }
+        0% {
+            transform: rotateY(0deg);
+        }
+
+        100% {
+            transform: rotateY(1800deg);
+        }
     }
 
     @keyframes flipTail {
-        0%   { transform: rotateY(180deg); }
-        100% { transform: rotateY(1980deg); }
+        0% {
+            transform: rotateY(180deg);
+        }
+
+        100% {
+            transform: rotateY(1980deg);
+        }
     }
 
     .result {
@@ -247,23 +257,35 @@
 <div class="app">
 
     <div class="title">🪙 Head or Tail</div>
+
     <div class="subtitle">
         Choose your side. Let the coin decide.
     </div>
 
-    <div class="choice-title">What do you choose?</div>
+    <div class="choice-title">
+        What do you choose?
+    </div>
 
     <div class="choices">
-        <button class="choice" id="headBtn" onclick="choose('Head')">
+
+        <button
+            class="choice"
+            id="headBtn"
+            onclick="choose('Head')">
             🗿 HEAD
         </button>
 
-        <button class="choice" id="tailBtn" onclick="choose('Tail')">
+        <button
+            class="choice"
+            id="tailBtn"
+            onclick="choose('Tail')">
             🪙 TAIL
         </button>
+
     </div>
 
     <div class="coin-area">
+
         <div class="coin" id="coin">
 
             <div class="coin-face head">
@@ -275,17 +297,23 @@
             </div>
 
         </div>
+
     </div>
 
     <div class="result" id="result">
         Choose a side first
     </div>
 
-    <button class="start" id="startBtn" onclick="startDice()" disabled>
+    <button
+        class="start"
+        id="startBtn"
+        onclick="startDice()"
+        disabled>
         START DICE
     </button>
 
     <div class="stats">
+
         <div class="stat">
             <div class="number" id="rounds">0</div>
             <div class="label">ROUNDS</div>
@@ -300,14 +328,24 @@
             <div class="number" id="accuracy">0%</div>
             <div class="label">ACCURACY</div>
         </div>
+
     </div>
 
     <div class="history">
-        <div class="history-title">RESULT HISTORY</div>
-        <div class="history-list" id="history"></div>
+
+        <div class="history-title">
+            RESULT HISTORY
+        </div>
+
+        <div
+            class="history-list"
+            id="history">
+        </div>
+
     </div>
 
 </div>
+
 
 <script>
 
@@ -319,87 +357,209 @@ const coin = document.getElementById("coin");
 const result = document.getElementById("result");
 const startBtn = document.getElementById("startBtn");
 
+
+// ==============================
+// CHOOSE HEAD OR TAIL
+// ==============================
+
 function choose(side) {
 
     selected = side;
 
-    document.getElementById("headBtn").classList.remove("selected");
-    document.getElementById("tailBtn").classList.remove("selected");
+    // Remove previous selection
+    document
+        .getElementById("headBtn")
+        .classList.remove("selected");
 
+    document
+        .getElementById("tailBtn")
+        .classList.remove("selected");
+
+
+    // Highlight selected choice
     if (side === "Head") {
-        document.getElementById("headBtn").classList.add("selected");
+
+        document
+            .getElementById("headBtn")
+            .classList.add("selected");
+
     } else {
-        document.getElementById("tailBtn").classList.add("selected");
+
+        document
+            .getElementById("tailBtn")
+            .classList.add("selected");
+
     }
 
-    result.innerHTML = `You chose <span>${side}</span>`;
+
+    result.innerHTML =
+        `You chose <span>${side}</span>`;
+
     startBtn.disabled = false;
 }
+
+
+// ==============================
+// START COIN FLIP
+// ==============================
 
 function startDice() {
 
     if (!selected) return;
 
+    // Prevent multiple clicks
     startBtn.disabled = true;
 
     result.innerHTML = "Flipping...";
 
-    // Remove previous animation
-    coin.classList.remove("flip-head", "flip-tail");
 
-    // Force browser reflow so animation can restart
+    // Remove previous animation
+    coin.classList.remove(
+        "flip-head",
+        "flip-tail"
+    );
+
+
+    // Force browser reflow
+    // so animation can restart
     void coin.offsetWidth;
 
-    /*
-        IMPORTANT:
-        The result is intentionally set to the
-        user's selected choice.
-    */
-    const finalResult = selected;
 
+    // =====================================
+    // TRUE RANDOM RESULT
+    // =====================================
+    //
+    // Math.random() generates a random
+    // number from 0 (inclusive) to 1.
+    //
+    // Less than 0.5  = Head
+    // 0.5 or greater = Tail
+    //
+    // The user's selection does NOT affect
+    // this result.
+    // =====================================
+
+    const finalResult =
+        Math.random() < 0.5
+            ? "Head"
+            : "Tail";
+
+
+    // Animate the correct side
     if (finalResult === "Head") {
+
         coin.classList.add("flip-head");
+
     } else {
+
         coin.classList.add("flip-tail");
+
     }
 
+
+    // Wait until animation finishes
     setTimeout(() => {
 
         rounds++;
-        wins++;
+
+
+        // Check whether user's prediction
+        // matches the random result
+
+        if (selected === finalResult) {
+            wins++;
+        }
+
+
+        // Display result
 
         result.innerHTML =
-            `Result: <span>${finalResult}</span> 🎉`;
+            `Result: <span>${finalResult}</span>`;
 
-        document.getElementById("rounds").textContent = rounds;
-        document.getElementById("wins").textContent = wins;
 
-        document.getElementById("accuracy").textContent =
-            Math.round((wins / rounds) * 100) + "%";
+        // Update rounds
+
+        document
+            .getElementById("rounds")
+            .textContent = rounds;
+
+
+        // Update correct predictions
+
+        document
+            .getElementById("wins")
+            .textContent = wins;
+
+
+        // Calculate accuracy
+
+        const accuracy =
+            Math.round((wins / rounds) * 100);
+
+
+        document
+            .getElementById("accuracy")
+            .textContent =
+            accuracy + "%";
+
+
+        // Add result to history
 
         addHistory(finalResult);
+
+
+        // Allow another flip
 
         startBtn.disabled = false;
 
     }, 2000);
 }
 
+
+// ==============================
+// RESULT HISTORY
+// ==============================
+
 function addHistory(value) {
 
-    const history = document.getElementById("history");
+    const history =
+        document.getElementById("history");
 
-    const item = document.createElement("div");
 
-    item.className = "history-item";
+    const item =
+        document.createElement("div");
 
-    item.textContent =
-        value === "Head" ? "🗿 Head" : "🪙 Tail";
+
+    item.className =
+        "history-item";
+
+
+    if (value === "Head") {
+
+        item.textContent =
+            "🗿 Head";
+
+    } else {
+
+        item.textContent =
+            "🪙 Tail";
+
+    }
+
+
+    // Newest result appears first
 
     history.prepend(item);
 
-    // Keep last 10 results
+
+    // Keep only the last 10 results
+
     while (history.children.length > 10) {
-        history.removeChild(history.lastChild);
+
+        history.removeChild(
+            history.lastChild
+        );
+
     }
 }
 
